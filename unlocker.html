@@ -122,17 +122,15 @@
     // ---------------------
 
     function getLink() {
-      var query = window.location.search;
-      var match = query.match(/[?&]link=/);
-      if (!match) return null;
-      var start = match.index + match[0].length;
-      var rawLink = query.substring(start);
+      var href = window.location.href;
+      var index = href.indexOf("link=");
+      if (index === -1) return null;
+      var rawLink = href.substring(index + 5);
       try { return decodeURIComponent(rawLink); } catch (e) { return rawLink; }
     }
 
     var link = getLink();
     
-    // Changed validation: Now accepts any link as long as it's not empty
     var isValid = link && link.trim() !== ""; 
 
     if (!isValid) {
