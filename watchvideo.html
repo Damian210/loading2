@@ -26,6 +26,7 @@
       max-width: 350px; 
       box-sizing: border-box;
       text-align: center;
+      position: relative;
     }
 
     /* Video Player Wrapper */
@@ -35,7 +36,7 @@
       margin-bottom: 15px;
       border-radius: 8px;
       overflow: hidden;
-      display: none; /* Image එකක් නැතිවිට Hide වේ */
+      display: none;
       background: #000;
       cursor: pointer;
     }
@@ -65,7 +66,7 @@
       align-items: center;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
       transition: all 0.2s ease-in-out;
-      pointer-events: none; /* Button එක මත Click කිරීම වැළැක්වීමට */
+      pointer-events: none;
     }
 
     /* Play Icon (Triangle) */
@@ -77,12 +78,11 @@
       border-style: solid;
       border-width: 10px 0 10px 18px;
       border-color: transparent transparent transparent #ffffff;
-      margin-left: 4px; /* Centering adjustment for triangle */
+      margin-left: 4px;
     }
 
-    /* Hover effect on Image container */
     .media-container:hover .play-btn {
-      background: rgba(255, 0, 0, 0.85); /* Youtube style Red color on hover */
+      background: rgba(255, 0, 0, 0.85);
       border-color: #ffffff;
       transform: translate(-50%, -50%) scale(1.1);
     }
@@ -143,6 +143,51 @@
       width: 0%; 
       transition: width 0.7s ease-in-out; 
     }
+
+    /* Modal / Popup Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      padding: 15px;
+      box-sizing: border-box;
+    }
+
+    .modal-box {
+      background: #252525;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 300px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+      border: 1px solid #333;
+    }
+
+    .modal-box p {
+      margin: 0 0 15px 0;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      color: #ddd;
+    }
+
+    .modal-close-btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
   </style>
 </head>
 <body>
@@ -175,6 +220,14 @@
     </a>
   </div>
 
+  <!-- Custom Popup Modal -->
+  <div id="noticeModal" class="modal-overlay">
+    <div class="modal-box">
+      <p id="modalText">🔒 Please complete the step below to unlock and watch the full video!</p>
+      <button id="modalCloseBtn" class="modal-close-btn">OK</button>
+    </div>
+  </div>
+
 <script>
 (function(_w, _d) {
     // --- CONFIGURATION ---
@@ -192,18 +245,31 @@
     var _l = _getParam('link');
     var _img = _getParam('image');
 
-    // Dynamic Image සහ Media Box පෙන්නුම් කිරීම
+    var modal = _d.getElementById("noticeModal");
+    var modalText = _d.getElementById("modalText");
+    var modalCloseBtn = _d.getElementById("modalCloseBtn");
+
+    // Dynamic Image පෙන්නුම් කිරීම
     if (_img && (_img.startsWith("http://") || _img.startsWith("https://"))) {
         var imgEl = _d.getElementById("dynamicImg");
         var mediaBox = _d.getElementById("mediaBox");
         imgEl.src = decodeURIComponent(_img);
         mediaBox.style.display = "block";
 
-        // User Image/Play Button එක Click කළොත් Unlock Button එක Trigger කිරීම
+        // Image/Play button eka click කළ විට popup එක පෙන්වයි
         mediaBox.addEventListener("click", function() {
-            _d.getElementById("unlockBtn").click();
+            if (localStorage.getItem(_k) === "1") {
+                modalText.innerText = "✅ Video is already unlocked! Click 'Proceed / Visit Link' to view.";
+            } else {
+                modalText.innerText = "🔒 Please complete the step below to unlock and watch the video!";
+            }
+            modal.style.display = "flex";
         });
     }
+
+    modalCloseBtn.addEventListener("click", function() {
+        modal.style.display = "none";
+    });
 
     // Target Link එක Check කිරීම
     if (!_l || !(_l.startsWith("http://") || _l.startsWith("https://"))) {
