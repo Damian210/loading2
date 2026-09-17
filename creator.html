@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Private Link Extractor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f0f0f;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 0 15px;
+    }
+    .container {
+      background: #1c1c1c;
+      padding: 30px 20px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 15px 0;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background: #2a2a2a;
+      color: #fff;
+      box-sizing: border-box;
+      font-size: 0.9rem;
+    }
+    .btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      width: 100%;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn:hover { background: #0056b3; }
+    .status { margin-top: 10px; font-size: 0.85rem; color: #00c853; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h3>Private Link Extractor</h3>
+    <input type="text" id="linkBox" readonly placeholder="No link detected...">
+    <button class="btn" onclick="copyLink()">Copy Target Link</button>
+    <div id="status" class="status"></div>
+  </div>
+
+<script>
+  (function() {
+    var fullUrl = window.location.href;
+    var index = fullUrl.indexOf("link=");
+    if (index !== -1) {
+      var rawLink = fullUrl.substring(index + 5);
+      try {
+        var cleanLink = decodeURIComponent(rawLink);
+        document.getElementById("linkBox").value = cleanLink;
+      } catch (e) {
+        document.getElementById("linkBox").value = rawLink;
+      }
+      // Clean URL bar while keeping extracted link in input
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  })();
+
+  function copyLink() {
+    var copyText = document.getElementById("linkBox");
+    if (!copyText.value) return;
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(copyText.value);
+    document.getElementById("status").innerText = "Link copied to clipboard! ✔";
+  }
+</script>
+</body>
+</html>
