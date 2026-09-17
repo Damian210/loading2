@@ -246,7 +246,6 @@
     var _img = _getParam('image');
 
     var modal = _d.getElementById("noticeModal");
-    var modalText = _d.getElementById("modalText");
     var modalCloseBtn = _d.getElementById("modalCloseBtn");
 
     // Dynamic Image පෙන්නුම් කිරීම
@@ -256,14 +255,15 @@
         imgEl.src = decodeURIComponent(_img);
         mediaBox.style.display = "block";
 
-        // Image/Play button eka click කළ විට popup එක පෙන්වයි
+        // Click Event එක handle කිරීම
         mediaBox.addEventListener("click", function() {
             if (localStorage.getItem(_k) === "1") {
-                modalText.innerText = "✅ Video is already unlocked! Click 'Proceed / Visit Link' to view.";
+                // Unlock වී ඇත්නම් කෙළින්ම Link එකට Redirect වේ
+                _w.location.href = _l;
             } else {
-                modalText.innerText = "🔒 Please complete the step below to unlock and watch the video!";
+                // Unlock වී නැත්නම් Popup Modal එක පෙන්වයි
+                modal.style.display = "flex";
             }
-            modal.style.display = "flex";
         });
     }
 
