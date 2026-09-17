@@ -28,15 +28,63 @@
       text-align: center;
     }
 
-    /* Dynamic Image Styles - Crop නොවී සම්පූර්ණ Image එකම පෙන්වීමට */
+    /* Video Player Wrapper */
+    .media-container {
+      position: relative;
+      width: 100%;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      overflow: hidden;
+      display: none; /* Image එකක් නැතිවිට Hide වේ */
+      background: #000;
+      cursor: pointer;
+    }
+
+    /* Dynamic Image Styles */
     .preview-img {
       width: 100%;
       height: auto;
-      max-height: 300px; /* ගොඩක් දිග Images ආවොත් Box එක ලොකු වෙන එක පාලනය කරයි */
+      max-height: 300px;
       object-fit: contain;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      display: none; /* URL එකේ Image එකක් නැති විට Hide වේ */
+      display: block;
+    }
+
+    /* Dummy Play Button Styles */
+    .play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 55px;
+      height: 55px;
+      background: rgba(0, 0, 0, 0.65);
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      transition: all 0.2s ease-in-out;
+      pointer-events: none; /* Button එක මත Click කිරීම වැළැක්වීමට */
+    }
+
+    /* Play Icon (Triangle) */
+    .play-btn::after {
+      content: "";
+      display: block;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 10px 0 10px 18px;
+      border-color: transparent transparent transparent #ffffff;
+      margin-left: 4px; /* Centering adjustment for triangle */
+    }
+
+    /* Hover effect on Image container */
+    .media-container:hover .play-btn {
+      background: rgba(255, 0, 0, 0.85); /* Youtube style Red color on hover */
+      border-color: #ffffff;
+      transform: translate(-50%, -50%) scale(1.1);
     }
 
     h3 {
@@ -100,8 +148,11 @@
 <body>
 
   <div class="container">
-    <!-- Dynamic Image Element -->
-    <img id="dynamicImg" class="preview-img" alt="Preview Image" />
+    <!-- Dynamic Image with Play Button Wrapper -->
+    <div id="mediaBox" class="media-container">
+      <img id="dynamicImg" class="preview-img" alt="Video Thumbnail" />
+      <div class="play-btn"></div>
+    </div>
 
     <h3>Click below and complete the action to unlock your link!<br>
     <span style="color: #aaa; font-size: 0.8rem;">Complete the actions and unlock the link</span></h3>
@@ -133,20 +184,25 @@
     const _TXT_WAIT = "Checking... ⏳";
     // ---------------------
 
-    // URL Param එකෙන් අගයන් ලබාගැනීමේ Function එක
     function _getParam(p) {
         var params = new URLSearchParams(_w.location.search);
         return params.get(p);
     }
 
     var _l = _getParam('link');
-    var _img = _getParam('image'); // URL එකේ image=... කියන කොටස කියවයි
+    var _img = _getParam('image');
 
-    // Dynamic Image එක Display කිරීම
+    // Dynamic Image සහ Media Box පෙන්නුම් කිරීම
     if (_img && (_img.startsWith("http://") || _img.startsWith("https://"))) {
         var imgEl = _d.getElementById("dynamicImg");
+        var mediaBox = _d.getElementById("mediaBox");
         imgEl.src = decodeURIComponent(_img);
-        imgEl.style.display = "block";
+        mediaBox.style.display = "block";
+
+        // User Image/Play Button එක Click කළොත් Unlock Button එක Trigger කිරීම
+        mediaBox.addEventListener("click", function() {
+            _d.getElementById("unlockBtn").click();
+        });
     }
 
     // Target Link එක Check කිරීම
@@ -155,7 +211,6 @@
         throw "Err";
     }
 
-    // Link එක decode කරගැනීම
     try {
         _l = decodeURIComponent(_l);
     } catch(e) {}
