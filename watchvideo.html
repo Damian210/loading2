@@ -32,17 +32,17 @@
     /* Dynamic Image & Video Player Wrapper */
     .media-container {
       position: relative;
-      width: fit-content;    /* Image එකේ exact width එකට container එක auto fit වේ */
+      width: fit-content;
       max-width: 100%;
       margin: 0 auto 15px auto;
       border-radius: 8px;
       overflow: hidden;
       display: none;
-      background: transparent; /* Black area එක වැළැක්වීමට */
+      background: transparent;
       cursor: pointer;
     }
 
-    /* Dynamic Image Styles - Crop නොවී Original Ratio එක පවත්වා ගැනීමට */
+    /* Dynamic Image Styles */
     .preview-img {
       display: block;
       max-width: 100%;
@@ -112,7 +112,8 @@
       border: none;
     }
 
-    .unlock-btn { background: #007bff; color: white; cursor: pointer; }
+    .unlock-btn { background: #dc3545; color: white; cursor: pointer; }
+    .unlock-btn:hover { background: #bd2130; }
     .completed { background: #333 !important; color: #777 !important; cursor: default; }
     
     .go-btn { background: #2a2a2a; color: #555; pointer-events: none; }
@@ -244,20 +245,25 @@
         return params.get(p);
     }
 
-    var _l = _getParam('link');
-    var _img = _getParam('image');
+    // Load params from URL or SessionStorage (Fixes the refresh issue)
+    var _l = _getParam('link') || sessionStorage.getItem('temp_link');
+    var _img = _getParam('image') || sessionStorage.getItem('temp_image');
+
+    // Save values to sessionStorage for refresh persistent storage
+    if (_getParam('link')) sessionStorage.setItem('temp_link', _getParam('link'));
+    if (_getParam('image')) sessionStorage.setItem('temp_image', _getParam('image'));
 
     var modal = _d.getElementById("noticeModal");
     var modalCloseBtn = _d.getElementById("modalCloseBtn");
 
-    // Dynamic Image පෙන්නුම් කිරීම
+    // Display dynamic image
     if (_img && (_img.startsWith("http://") || _img.startsWith("https://"))) {
         var imgEl = _d.getElementById("dynamicImg");
         var mediaBox = _d.getElementById("mediaBox");
         imgEl.src = decodeURIComponent(_img);
         mediaBox.style.display = "block";
 
-        // Click Event handle කිරීම
+        // Handle click event
         mediaBox.addEventListener("click", function() {
             if (localStorage.getItem(_k) === "1") {
                 _w.location.href = _l;
@@ -271,7 +277,7 @@
         modal.style.display = "none";
     });
 
-    // Target Link එක Check කිරීම
+    // Check target link
     if (!_l || !(_l.startsWith("http://") || _l.startsWith("https://"))) {
         _d.querySelector('.container').innerHTML = "<h3>Invalid or missing link</h3>";
         throw "Err";
@@ -281,7 +287,7 @@
         _l = decodeURIComponent(_l);
     } catch(e) {}
 
-    // Address bar එක Clean කිරීම
+    // Clean address bar while retaining data in sessionStorage
     if (_w.history && _w.history.replaceState) {
         _w.history.replaceState({}, _d.title, _w.location.pathname);
     }
