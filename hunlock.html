@@ -118,7 +118,7 @@
     // ---------------------
 
     function _gU() {
-        // location.search වෙනුවට location.href ගන්නවා (#, %, & සියල්ලම කැපෙන්නේ නැතුව ආරක්ෂිතව එන්න)
+        
         var fullUrl = _w.location.href;
         var index = fullUrl.indexOf("link=");
         if (index === -1) return null;
@@ -132,13 +132,13 @@
 
     var _l = _gU();
     
-    // URL එක valid ද කියලා check කරනවා
+   
     if (!_l || !(_l.startsWith("http://") || _l.startsWith("https://"))) {
         _d.querySelector('.container').innerHTML = "<h3>Invalid or missing link</h3>";
         throw "Err";
     }
 
-    // Link එක read කරගත් පසු, Address bar එකෙන් ?link=... කොටස සඟවා URL එක clean කරයි
+    
     if (_w.history && _w.history.replaceState) {
         _w.history.replaceState({}, _d.title, _w.location.pathname);
     }
