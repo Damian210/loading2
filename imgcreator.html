@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Link Generator & Copier</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f0f0f;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 15px;
+    }
+
+    /* Main wrapper to hold Preview and Generator Side-by-Side */
+    .main-wrapper {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      align-items: flex-start; /* top alignment for dynamic height */
+      max-width: 800px;
+      width: 100%;
+    }
+
+    /* Image Preview Container on Left */
+    .preview-container {
+      background: #1c1c1c;
+      padding: 20px;
+      border-radius: 12px;
+      width: 280px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      box-sizing: border-box;
+      flex-shrink: 0;
+    }
+
+    .preview-title {
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 12px;
+      align-self: flex-start;
+    }
+
+    .img-preview-box {
+      width: 100%;
+      min-height: 150px; /* Empty වෙලාවට විතරක් පෙනෙන height එක */
+      height: auto;
+      background: #2a2a2a;
+      border: 2px dashed #333;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .img-preview-box img {
+      width: 100%;
+      height: auto; /* Image එකේ original ratio එකෙන්ම height එක හැදෙන්න */
+      display: none;
+      border-radius: 6px;
+    }
+
+    .placeholder-text {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    /* Main Form Container */
+    .container {
+      background: #1c1c1c;
+      padding: 25px 20px;
+      border-radius: 12px;
+      flex-grow: 1;
+      box-sizing: border-box;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    h3 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+      color: #007bff;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 5px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: #2a2a2a;
+      color: #fff;
+      box-sizing: border-box;
+      font-size: 0.9rem;
+      outline: none;
+      resize: vertical;
+    }
+
+    textarea {
+      height: 60px;
+    }
+
+    textarea:focus, input[type="text"]:focus {
+      border-color: #007bff;
+    }
+
+    .btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      width: 100%;
+      font-weight: bold;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: #0056b3;
+    }
+
+    .paste-btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .paste-btn:hover {
+      background: #218838;
+    }
+
+    .status {
+      margin-top: 12px;
+      font-size: 0.85rem;
+      color: #00c853;
+      font-weight: bold;
+      height: 20px;
+    }
+
+    /* Mobile Responsive Layout */
+    @media (max-width: 650px) {
+      .main-wrapper {
+        flex-direction: column;
+      }
+      .preview-container {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="main-wrapper">
+    <!-- LEFT SIDE: Image Preview -->
+    <div class="preview-container">
+      <span class="preview-title">Image Preview</span>
+      <div class="img-preview-box">
+        <span class="placeholder-text" id="previewText">No Image Loaded</span>
+        <img id="imgPreview" src="" alt="Preview">
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE: Generator Box -->
+    <div class="container">
+      <h3>Open-Link Creator</h3>
+      
+      <!-- 1. Target Link Section -->
+      <label for="rawInput">1. Paste Original Link Here:</label>
+      <div class="input-group">
+        <textarea id="rawInput" placeholder="https://google.com" oninput="generateLink()"></textarea>
+        <button class="paste-btn" onclick="pasteClipboard('rawInput')">Paste Target Link</button>
+      </div>
+
+      <!-- 2. Image Link Section -->
+      <label for="imageInput">2. Paste Image Link Here:</label>
+      <div class="input-group">
+        <input type="text" id="imageInput" placeholder="https://i.postimg.cc/image.jpg" oninput="updateImageAndLink()">
+        <button class="paste-btn" onclick="pasteClipboard('imageInput')">Paste Image Link</button>
+      </div>
+
+      <!-- 3. Final Output Section -->
+      <label for="finalOutput">3. Final Unlocker Link (Generated):</label>
+      <textarea id="finalOutput" readonly placeholder="" style="margin-bottom: 15px;"></textarea>
+
+      <button class="btn" onclick="copyFinalLink()">Copy Full Link</button>
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+
+<script>
+  const BASE_URL = "https://open-link.online/watchvideo?link=";
+
+  function updateImageAndLink() {
+    const imageUrl = document.getElementById("imageInput").value.trim();
+    const imgPreview = document.getElementById("imgPreview");
+    const previewText = document.getElementById("previewText");
+
+    if (imageUrl !== "") {
+      imgPreview.src = imageUrl;
+      imgPreview.style.display = "block";
+      previewText.style.display = "none";
+    } else {
+      imgPreview.src = "";
+      imgPreview.style.display = "none";
+      previewText.innerText = "No Image Loaded";
+      previewText.style.display = "block";
+    }
+
+    imgPreview.onerror = function() {
+      imgPreview.style.display = "none";
+      previewText.style.display = "block";
+      previewText.innerText = "Invalid Image URL";
+    };
+
+    generateLink();
+  }
+
+  function generateLink() {
+    const rawValue = document.getElementById("rawInput").value.trim();
+    const imageValue = document.getElementById("imageInput").value.trim();
+    const outputBox = document.getElementById("finalOutput");
+    const statusBox = document.getElementById("status");
+
+    statusBox.innerText = "";
+
+    if (rawValue !== "") {
+      let generatedUrl = BASE_URL + rawValue;
+      if (imageValue !== "") {
+        generatedUrl += "&image=" + imageValue;
+      }
+      outputBox.value = generatedUrl;
+    } else {
+      outputBox.value = "";
+    }
+  }
+
+  async function pasteClipboard(elementId) {
+    const statusBox = document.getElementById("status");
+    try {
+      const text = await navigator.clipboard.readText();
+      document.getElementById(elementId).value = text;
+      
+      if (elementId === "imageInput") {
+        updateImageAndLink();
+      } else {
+        generateLink();
+      }
+
+      statusBox.style.color = "#00c853";
+      statusBox.innerText = "Pasted successfully! ✔";
+    } catch (err) {
+      statusBox.style.color = "#ff5252";
+      statusBox.innerText = "Please allow Clipboard permission!";
+    }
+  }
+
+  function copyFinalLink() {
+    const outputBox = document.getElementById("finalOutput");
+    const statusBox = document.getElementById("status");
+
+    if (!outputBox.value) {
+      statusBox.style.color = "#ff5252";
+      statusBox.innerText = "Please paste a link first!";
+      return;
+    }
+
+    outputBox.select();
+    outputBox.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(outputBox.value).then(() => {
+      statusBox.style.color = "#00c853";
+      statusBox.innerText = "Full link copied to clipboard! ✔";
+    }).catch(() => {
+      document.execCommand("copy");
+      statusBox.style.color = "#00c853";
+      statusBox.innerText = "Full link copied to clipboard! ✔";
+    });
+  }
+</script>
+</body>
+</html>
