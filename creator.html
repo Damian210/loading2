@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Private Link Extractor</title>
+  <title>Link Generator & Copier</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,79 +12,175 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
-      padding: 0 15px;
+      padding: 15px;
     }
+
     .container {
       background: #1c1c1c;
-      padding: 30px 20px;
+      padding: 25px 20px;
       border-radius: 12px;
       width: 100%;
-      max-width: 400px;
+      max-width: 450px;
       box-sizing: border-box;
       text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     }
-    input {
+
+    h3 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+      color: #007bff;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 5px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    input, textarea {
       width: 100%;
       padding: 12px;
-      margin: 15px 0;
-      border-radius: 6px;
+      border-radius: 8px;
       border: 1px solid #333;
       background: #2a2a2a;
       color: #fff;
       box-sizing: border-box;
       font-size: 0.9rem;
+      outline: none;
     }
+
+    input:focus, textarea:focus {
+      border-color: #007bff;
+    }
+
+    textarea {
+      resize: vertical;
+      height: 80px;
+      margin-bottom: 15px;
+    }
+
     .btn {
       background: #007bff;
       color: white;
       border: none;
-      padding: 12px;
-      border-radius: 6px;
+      padding: 14px;
+      border-radius: 8px;
       width: 100%;
       font-weight: bold;
+      font-size: 0.95rem;
       cursor: pointer;
+      transition: background 0.2s;
     }
-    .btn:hover { background: #0056b3; }
-    .status { margin-top: 10px; font-size: 0.85rem; color: #00c853; }
+
+    .btn:hover {
+      background: #0056b3;
+    }
+
+    .paste-btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 0 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .paste-btn:hover {
+      background: #218838;
+    }
+
+    .status {
+      margin-top: 12px;
+      font-size: 0.85rem;
+      color: #00c853;
+      font-weight: bold;
+      height: 20px;
+    }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h3>Private Link Extractor</h3>
-    <input type="text" id="linkBox" readonly placeholder="No link detected...">
-    <button class="btn" onclick="copyLink()">Copy Target Link</button>
+    <h3>Open-Link Creator</h3>
+    
+    <label for="rawInput">1. Paste Original Link Here:</label>
+    <div class="input-group">
+      <input type="text" id="rawInput" placeholder="" oninput="generateLink()">
+      <button class="paste-btn" onclick="pasteClipboard()">Paste</button>
+    </div>
+
+    <label for="finalOutput">2. Final Unlocker Link (Generated):</label>
+    <textarea id="finalOutput" readonly placeholder=""></textarea>
+
+    <button class="btn" onclick="copyFinalLink()">Copy Full Link</button>
     <div id="status" class="status"></div>
   </div>
 
 <script>
-  (function() {
-    var fullUrl = window.location.href;
-    var index = fullUrl.indexOf("link=");
-    if (index !== -1) {
-      var rawLink = fullUrl.substring(index + 5);
-      try {
-        var cleanLink = decodeURIComponent(rawLink);
-        document.getElementById("linkBox").value = cleanLink;
-      } catch (e) {
-        document.getElementById("linkBox").value = rawLink;
-      }
-      // Clean URL bar while keeping extracted link in input
-      if (window.history && window.history.replaceState) {
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-    }
-  })();
+  const BASE_URL = "https://open-link.online/hunlock?link=";
 
-  function copyLink() {
-    var copyText = document.getElementById("linkBox");
-    if (!copyText.value) return;
-    copyText.select();
-    copyText.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(copyText.value);
-    document.getElementById("status").innerText = "Link copied to clipboard! ✔";
+  function generateLink() {
+    const rawValue = document.getElementById("rawInput").value.trim();
+    const outputBox = document.getElementById("finalOutput");
+    const statusBox = document.getElementById("status");
+
+    statusBox.innerText = "";
+
+    if (rawValue !== "") {
+      outputBox.value = BASE_URL + rawValue;
+    } else {
+      outputBox.value = "";
+    }
+  }
+
+  async function pasteClipboard() {
+    const statusBox = document.getElementById("status");
+    try {
+      const text = await navigator.clipboard.readText();
+      document.getElementById("rawInput").value = text;
+      generateLink();
+      statusBox.style.color = "#00c853";
+      statusBox.innerText = "Pasted successfully! ✔";
+    } catch (err) {
+      statusBox.style.color = "#ff5252";
+      statusBox.innerText = "Please allow Clipboard permission!";
+    }
+  }
+
+  function copyFinalLink() {
+    const outputBox = document.getElementById("finalOutput");
+    const statusBox = document.getElementById("status");
+
+    if (!outputBox.value) {
+      statusBox.style.color = "#ff5252";
+      statusBox.innerText = "Please paste a link first!";
+      return;
+    }
+
+    outputBox.select();
+    outputBox.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(outputBox.value).then(() => {
+      statusBox.style.color = "#00c853";
+      statusBox.innerText = "Full link copied to clipboard! ✔";
+    }).catch(() => {
+      document.execCommand("copy");
+      statusBox.style.color = "#00c853";
+      statusBox.innerText = "Full link copied to clipboard! ✔";
+    });
   }
 </script>
 </body>
