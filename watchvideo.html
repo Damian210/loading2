@@ -29,25 +29,27 @@
       position: relative;
     }
 
-    /* Video Player Wrapper */
+    /* Dynamic Image & Video Player Wrapper */
     .media-container {
       position: relative;
-      width: 100%;
-      margin-bottom: 15px;
+      width: fit-content;    /* Image එකේ exact width එකට container එක auto fit වේ */
+      max-width: 100%;
+      margin: 0 auto 15px auto;
       border-radius: 8px;
       overflow: hidden;
       display: none;
-      background: #000;
+      background: transparent; /* Black area එක වැළැක්වීමට */
       cursor: pointer;
     }
 
-    /* Dynamic Image Styles */
+    /* Dynamic Image Styles - Crop නොවී Original Ratio එක පවත්වා ගැනීමට */
     .preview-img {
-      width: 100%;
-      height: auto;
-      max-height: 300px;
-      object-fit: contain;
       display: block;
+      max-width: 100%;
+      height: auto;
+      max-height: 350px;
+      border-radius: 8px;
+      margin: 0 auto;
     }
 
     /* Dummy Play Button Styles */
@@ -255,13 +257,11 @@
         imgEl.src = decodeURIComponent(_img);
         mediaBox.style.display = "block";
 
-        // Click Event එක handle කිරීම
+        // Click Event handle කිරීම
         mediaBox.addEventListener("click", function() {
             if (localStorage.getItem(_k) === "1") {
-                // Unlock වී ඇත්නම් කෙළින්ම Link එකට Redirect වේ
                 _w.location.href = _l;
             } else {
-                // Unlock වී නැත්නම් Popup Modal එක පෙන්වයි
                 modal.style.display = "flex";
             }
         });
