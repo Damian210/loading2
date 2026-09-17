@@ -28,14 +28,15 @@
       text-align: center;
     }
 
-    /* Dynamic Image Styles */
+    /* Dynamic Image Styles - Crop නොවී සම්පූර්ණ Image එකම පෙන්වීමට */
     .preview-img {
       width: 100%;
-      max-height: 180px;
-      object-fit: cover;
+      height: auto;
+      max-height: 300px; /* ගොඩක් දිග Images ආවොත් Box එක ලොකු වෙන එක පාලනය කරයි */
+      object-fit: contain;
       border-radius: 8px;
       margin-bottom: 15px;
-      display: none; /* Image එකක් නැති විට Hide වේ */
+      display: none; /* URL එකේ Image එකක් නැති විට Hide වේ */
     }
 
     h3 {
