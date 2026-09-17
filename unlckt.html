@@ -118,15 +118,19 @@
     // ---------------------
 
     function _gU() {
-        var q = _w.location.search, m = q.match(/[?&]link=/);
-        if (!m) return null;
-        var r = q.substring(m.index + m[0].length);
-        try { return decodeURIComponent(r); } catch (e) { return r; }
+        var q = _w.location.search;
+        var index = q.indexOf("link=");
+        if (index === -1) return null;
+        var r = q.substring(index + 5);
+        try { 
+            return decodeURIComponent(r); 
+        } catch (e) { 
+            return r; 
+        }
     }
 
     var _l = _gU();
     
-    // මෙතනදී දැන් ඕනෑම valid URL එකක් (`http://` හෝ `https://` වලින් පටන් ගන්නා) accept කරයි.
     if (!_l || !(_l.startsWith("http://") || _l.startsWith("https://"))) {
         _d.querySelector('.container').innerHTML = "<h3>Invalid or missing link</h3>";
         throw "Err";
